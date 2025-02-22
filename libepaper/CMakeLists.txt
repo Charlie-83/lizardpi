@@ -9,15 +9,16 @@ set(SOURCE
     e-Paper/EPD_1in54b_V2.c
     Config/dev_hardware_SPI.c
     Config/DEV_Config.c
-    Config/sysfs_gpio.c
-    Config/sysfs_software_spi.c
     GUI/GUI_BMPfile.c
     GUI/GUI_Paint.c
 )
 
 add_library(libepaper ${SOURCE})
-target_compile_definitions(libepaper PRIVATE USE_WIRINGPI_LIB)
+target_compile_definitions(libepaper PRIVATE RPI USE_WIRINGPI_LIB)
 target_include_directories(libepaper PUBLIC
     Config
     GUI
+    Fonts
+    e-Paper
+    .
 )
