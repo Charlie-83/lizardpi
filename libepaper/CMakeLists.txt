@@ -22,3 +22,4 @@ target_include_directories(libepaper PUBLIC
     e-Paper
     .
 )
+target_link_libraries(libepaper PRIVATE wiringPi)
