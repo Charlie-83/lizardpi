@@ -44,12 +44,21 @@ int main() {
     delay(10);
     uint8_t rx_bytes[6];
     wiringPiI2CRawRead(fd, rx_bytes, 6);
+
     uint16_t t_ticks = rx_bytes[0] * 256 + rx_bytes[1];
     int t_deg = -45 + 175 * t_ticks / 65535;
 
+    uint16_t rh_ticks = rx_bytes[3] * 256 + rx_bytes[4];
+    int th_pRH = -6 + 125 * rh_ticks/65535;
+    if (th_pRH > 100)
+      th_pRH = 100;
+    else if (th_pRH < 0)
+      th_pRH = 0;
+
     Paint_SelectImage(BlackImage);
     Paint_Clear(WHITE);
-    Paint_DrawNum(5, 70, t_deg, &Font16, WHITE, BLACK);
+    Paint_DrawNum(5, 50, t_deg, &Font24, WHITE, BLACK);
+    Paint_DrawNum(5, 90, th_pRH, &Font24, WHITE, BLACK);
     EPD_1IN54B_V2_Display(BlackImage, RedImage);
     delay(2000);
   }
