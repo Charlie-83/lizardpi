@@ -57,8 +57,8 @@ int main() {
 
     Paint_SelectImage(BlackImage);
     Paint_Clear(WHITE);
-    Paint_DrawNum(5, 50, t_deg, &Font24, WHITE, BLACK);
-    Paint_DrawNum(5, 90, th_pRH, &Font24, WHITE, BLACK);
+    Paint_DrawNum(5, 50, t_deg, &Font24, BLACK, WHITE);
+    Paint_DrawNum(5, 90, th_pRH, &Font24, BLACK, WHITE);
     EPD_1IN54B_V2_Display(BlackImage, RedImage);
     delay(2000);
   }
