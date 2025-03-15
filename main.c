@@ -5,9 +5,32 @@
 
 #define SHT40_ADDRESS 0x44
 
+void read_sensor(int sensor, int* t_deg, int*th_pRH) {
+    const uint8_t tx_bytes[1] = {0xfd};
+    wiringPiI2CRawWrite(sensor, tx_bytes, 1);
+    delay(10);
+    uint8_t rx_bytes[6];
+    wiringPiI2CRawRead(sensor, rx_bytes, 6);
+
+    uint16_t t_ticks = rx_bytes[0] * 256 + rx_bytes[1];
+    *t_deg = -45 + 175 * t_ticks / 65535;
+
+    uint16_t rh_ticks = rx_bytes[3] * 256 + rx_bytes[4];
+    *th_pRH = -6 + 125 * rh_ticks/65535;
+    if (*th_pRH > 100)
+      *th_pRH = 100;
+    else if (*th_pRH < 0)
+      *th_pRH = 0;
+}
+
 int main() {
-  int fd = wiringPiI2CSetup(SHT40_ADDRESS);
-  if (fd == -1) {
+  int sensor_0 = wiringPiI2CSetupInterface("/dev/i2c-1", SHT40_ADDRESS);
+  if (sensor_0 == -1) {
+    printf("Failed to setup SHT40\n");
+    return -1;
+  }
+  int sensor_1 = wiringPiI2CSetupInterface("/dev/i2c-3", SHT40_ADDRESS);
+  if (sensor_1 == -1) {
     printf("Failed to setup SHT40\n");
     return -1;
   }
@@ -39,26 +62,19 @@ int main() {
   Paint_Clear(WHITE);
 
   while (1) {
-    const uint8_t tx_bytes[1] = {0xfd};
-    wiringPiI2CRawWrite(fd, tx_bytes, 1);
-    delay(10);
-    uint8_t rx_bytes[6];
-    wiringPiI2CRawRead(fd, rx_bytes, 6);
-
-    uint16_t t_ticks = rx_bytes[0] * 256 + rx_bytes[1];
-    int t_deg = -45 + 175 * t_ticks / 65535;
-
-    uint16_t rh_ticks = rx_bytes[3] * 256 + rx_bytes[4];
-    int th_pRH = -6 + 125 * rh_ticks/65535;
-    if (th_pRH > 100)
-      th_pRH = 100;
-    else if (th_pRH < 0)
-      th_pRH = 0;
-
     Paint_SelectImage(BlackImage);
     Paint_Clear(WHITE);
+    int t_deg;
+    int th_pRH;
+
+    read_sensor(sensor_0, &t_deg, &th_pRH);
     Paint_DrawNum(5, 50, t_deg, &Font24, BLACK, WHITE);
     Paint_DrawNum(5, 90, th_pRH, &Font24, BLACK, WHITE);
+
+    read_sensor(sensor_1, &t_deg, &th_pRH);
+    Paint_DrawNum(50, 50, t_deg, &Font24, BLACK, WHITE);
+    Paint_DrawNum(50, 90, th_pRH, &Font24, BLACK, WHITE);
+
     EPD_1IN54B_V2_Display(BlackImage, RedImage);
     delay(180000);
   }
