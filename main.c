@@ -1,5 +1,6 @@
 #include <epaper.h>
 #include <stdlib.h>
+#include <time.h>
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
@@ -61,6 +62,8 @@ int main() {
   Paint_SelectImage(RedImage);
   Paint_Clear(WHITE);
 
+  time_t rawtime;
+  struct tm *time_data;
   while (1) {
     Paint_SelectImage(BlackImage);
     Paint_Clear(WHITE);
@@ -74,6 +77,18 @@ int main() {
     read_sensor(sensor_1, &t_deg, &th_pRH);
     Paint_DrawNum(50, 100, t_deg, &Font24, BLACK, WHITE);
     Paint_DrawNum(100, 100, th_pRH, &Font24, BLACK, WHITE);
+
+    time(&rawtime);
+    time_data = localtime(&rawtime);
+    PAINT_TIME paint_time = {
+        .Sec = time_data->tm_sec,
+        .Min = time_data->tm_min,
+        .Hour = time_data->tm_hour,
+        .Day = time_data->tm_mday,
+        .Month = time_data->tm_mon,
+        .Year = time_data->tm_year,
+    };
+    Paint_DrawTime(5, 5, &paint_time, &Font24, BLACK, WHITE);
 
     EPD_1IN54B_V2_Display(BlackImage, RedImage);
     delay(180000);
