@@ -91,6 +91,23 @@ int main() {
     Paint_DrawTime(5, 5, &paint_time, &Font24, BLACK, WHITE);
 
     EPD_1IN54B_V2_Display(BlackImage, RedImage);
+
+    FILE *temp_file = fopen("/home/charlie/temp.log", "a");
+    if (temp_file == NULL) {
+        perror("Couldn't open temp.log");
+        return 1;
+    }
+    fprintf(temp_file, "%d\n", t_deg);
+    fclose(temp_file);
+
+    FILE *humidity_file = fopen("/home/charlie/humidity.log", "a");
+    if (humidity_file == NULL) {
+        perror("Couldn't open humidity.log");
+        return 1;
+    }
+    fprintf(humidity_file, "%d\n", th_pRH);
+    fclose(humidity_file);
+
     delay(180000);
   }
 
