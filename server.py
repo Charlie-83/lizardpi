@@ -2,6 +2,8 @@
 import http.server
 import socketserver
 import matplotlib.pyplot as plt
+import csv
+from datetime import datetime
 from urllib.parse import urlparse
 
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -9,13 +11,20 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         parsed_path = urlparse(self.path)
 
         if parsed_path.path == "/":
-            with open("/home/charlie/temp.log", "r") as f:
-                temperatures = [int(line.strip()) for line in f if line.strip()]
-            with open("/home/charlie/humidity.log", "r") as f:
-                humidities = [int(line.strip()) for line in f if line.strip()]
+            times = []
+            temperatures = []
+            humidities = []
+            with open("/home/charlie/lizard.log", "r") as f:
+                reader = csv.reader(f)
+                for row in reader:
+                    times.append(int(row[0]))
+                    temperatures.append(int(row[1]))
+                    humidities.append(int(row[2]))
+
+            datetimes = [datetime.fromtimestamp(ts) for ts in times]
 
             plt.figure()
-            plt.plot(temperatures, marker="o")
+            plt.plot(datetimes, temperatures, marker="o")
             plt.title("Temperatures")
             plt.xlabel("Index")
             plt.ylabel("Value")
@@ -23,7 +32,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             plt.close()
 
             plt.figure()
-            plt.plot(humidities, marker="o")
+            plt.plot(datetimes, humidities, marker="o")
             plt.title("Humidities")
             plt.xlabel("Index")
             plt.ylabel("Value")
