@@ -3,7 +3,7 @@ import http.server
 import socketserver
 import matplotlib.pyplot as plt
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 from urllib.parse import urlparse
 
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -22,6 +22,9 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                     humidities.append(int(row[2]))
 
             datetimes = [datetime.fromtimestamp(ts) for ts in times]
+            now = datetime.now()
+            yesterday = now - timedelta(days=1)
+            datetimes = [d for d in datetimes if yesterday <= d <= now]
 
             plt.figure()
             plt.plot(datetimes, temperatures, marker="o")
