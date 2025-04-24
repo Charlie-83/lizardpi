@@ -24,6 +24,8 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             datetimes = [datetime.fromtimestamp(ts) for ts in times]
             now = datetime.now()
             yesterday = now - timedelta(days=1)
+            temperatures = [t for i, t in enumerate(temperatures) if yesterday <= datetimes[i] <= now]
+            humidities = [t for i, t in enumerate(humidities) if yesterday <= datetimes[i] <= now]
             datetimes = [d for d in datetimes if yesterday <= d <= now]
 
             plt.figure()
