@@ -23,7 +23,14 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
             datetimes = [datetime.fromtimestamp(ts) for ts in times]
             now = datetime.now()
-            yesterday = now - timedelta(days=1)
+            if parsed_path.query == "":
+                days = 1
+            else:
+                try:
+                    days = int(parsed_path.query)
+                except ValueError:
+                    days = 1
+            yesterday = now - timedelta(days=days)
             temperatures = [t for i, t in enumerate(temperatures) if yesterday <= datetimes[i] <= now]
             humidities = [t for i, t in enumerate(humidities) if yesterday <= datetimes[i] <= now]
             datetimes = [d for d in datetimes if yesterday <= d <= now]
